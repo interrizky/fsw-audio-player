@@ -3,22 +3,22 @@
   padding-right: 30px;
 } */
 
-.search-box{
+.search-box {
   padding-top: 5%;
 }
 
-.list-music .title{
+.list-music .title {
   padding-top: 30px;
   /* margin-top: 5%; */
   /* margin-bottom: 15px; */
 }
 
-.list-music .wrapper-list .box-music-list{
+.list-music .wrapper-list .box-music-list {
   width: auto;
-  height: auto;;  
+  height: auto;
   position: relative;
   padding: 10px 5px;
-  margin: 5px 0;  
+  margin: 5px 0;
   align-items: center;
 }
 
@@ -52,6 +52,6 @@
   font-size: 10px;
 }
 
-.list-music .wrapper-list .box-music-list .button-box{
+.list-music .wrapper-list .box-music-list .button-box {
   text-align: center;
 }

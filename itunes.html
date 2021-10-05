@@ -11,12 +11,14 @@
 </head>
 <body>
   <div class="container-fluid">
+
     <div class="row box-content search-box">
       <div class="search-bar">
         <input type="text" class="form-control mx-auto input-search" placeholder="Sweet Chin Music">
         </input>
       </div>
     </div>
+
     <div class="row list-music">
       <div class="title">
         <h4> List of Music </h4>
@@ -25,19 +27,17 @@
                 
       </div>
     </div>
-    <div class="row music-player">
-      <div class="wrapper-music-player hide">
+
+<!--     <div class="box-content music-player">
+      <div class="wrapper-music-player">
         <div class="wrapper-box">
           <div class="image-music">
-            <div class="image" style="background-image: url(&quot;https://is3-ssl.mzstatic.com/image/thumb/Music124/v4/8d/45/1d/8d451d7c-2214-696a-234a-be10e20a8af2/source/100x100bb.jpg&quot;);">
-            </div>
+            <div class="image" style="background-image: url(./assets/images/pngfind-7.jpg);"></div>
           </div>
           <div class="box-player">
             <div class="description-music">
-              <h4 class="title-player">Kaatrai Konjam</h4>
-              <span class="artist-name">
-                <p>Artist : </p>Ilaiyaraaja &amp; Karthik
-              </span>
+              <h4 class="title-player">Mukadimah + Roman Picisan</h4>
+              <span class="artist-name"><p>Artist : </p>Dewa</span>
             </div>
           </div>
         </div>
@@ -53,52 +53,101 @@
           </div>
         </div>
         <div class="close-button">X</div>
-      </div>      
+      </div>
+    </div> -->
+
+    <div class="row music">
+
     </div>
+
   </div>
   <script type="text/javascript">
 
   let params = "";
   let textSearch = document.querySelector('.input-search');
+  let isiBoxMusicList = document.querySelector('.list-music .wrapper-list');
+  let boxPlayer = document.querySelector('.music');
   if( textSearch.value == "" || textSearch.value == null ){
-    params = "Dewa";
-  } else {
-    params = textSearch.value;
+    params = "Indonesia";
   }
 
-  fetch('https://itunes.apple.com/search?term='+params+'&country=ID&media=music&limit=10')
-  .then(function(response) {
-    return response.json();
-  })
-  .then(function(result) {
-    console.log(result);
-    // console.log(result.results[0]);
-    data = result;
-    for(let i=0; i<data.results.length; i++) {
-      let isiBoxMusicList = document.querySelector('.list-music .wrapper-list');
-      isiBoxMusicList.insertAdjacentHTML('beforeend', `
-        <div class="box-music-list list-number-${i} d-flex" id="list-${i}">
-          <div class="images-box col-1">
-            <div class="images" style="background-image: url(${data.results[i].artworkUrl100});"></div>          
-          </div>
-          <div class="desc-box col-10">
-            <h4 class="title">${data.results[i].trackName}</h4>
-            <span class="artist">${data.results[i].artistName}</span>
-            <span class="album">${data.results[i].collectionName}</span>
-          </div>
-          <div class="button-box col-1">
-            <button type="button" class="btn btn-outline-dark"><i class="bi-play-circle-fill"></i> PLAY</button>            
-          </div>
-          <div class="button-box col-1" style="display:none;">
-            <button type="button" class="btn btn-outline-dark" style=><i class="bi-stop-circle-fill"></i> STOP</button>            
-          </div>          
-        </div>       
-      `);
+  searchList(params);
+
+  textSearch.addEventListener('keypress', function(event){
+    if (event.keyCode === 13) {
+      isiBoxMusicList.innerHTML = '';
+      boxPlayer.innerHTML = '';
+      searchList(textSearch.value);
     }
-  })
-  .catch(function(error){
-    console.log(error);
-  })
+  });
+
+  function searchList(params) {
+    fetch('https://itunes.apple.com/search?term='+params+'&country=ID&media=music&limit=20')
+    .then(function(response) {
+      return response.json();
+    })
+    .then(function(result) {
+      console.log(result);
+      // console.log(result.results[0]);
+      data = result;
+      for(let i=0; i<data.results.length; i++) {
+        isiBoxMusicList.insertAdjacentHTML('beforeend', `
+          <div class="box-music-list list-number-${i} d-flex" id="list-${i}">
+            <div class="images-box col-1">
+              <div class="images" style="background-image: url(${data.results[i].artworkUrl100});"></div>          
+            </div>
+            <div class="desc-box col-10">
+              <h4 class="title">${data.results[i].trackName}</h4>
+              <span class="artist">${data.results[i].artistName}</span>
+              <span class="album">${data.results[i].collectionName}</span>
+            </div>
+            <div class="button-box-play-${i} col-1">
+              <button type="button" id="btn-play-${i}" class="btn-play-${i} btn btn-outline-dark"><i class="bi-play-circle-fill"></i> PLAY</button>            
+              <button type="button" id="btn-stop-${i}" class="btn-stop-${i} btn btn-outline-danger" style="display: none;"><i class="bi-stop-circle-fill"></i> STOP</button>            
+            </div>
+          </div>       
+        `);
+
+        boxPlayer.insertAdjacentHTML('beforeend', `
+          <div class="box box-${i} d-flex justify-content-center">
+            <image src="${data.results[i].artworkUrl100}" class="image-${i}" style="display: none;"></image>
+            <div class="detail-track-${i}" style="margin-left: 20px; display: none;">
+              <h4 class="title">${data.results[i].trackName}</h4>
+              <span class="artist">${data.results[i].artistName}</span>
+              <span class="album">${data.results[i].collectionName}</span>
+            </div>
+          </div>
+          <audio controls class="audio-${i} w-50 mx-auto col-12" style="display: none;">
+            <source class="trackPreview-${i}" src="${data.results[i].previewUrl}"> type="audio/mpeg"><</source> 
+          </audio>        
+        `);        
+        
+        document.querySelector('#btn-play-'+i).addEventListener('click', function(){
+          console.log("aku play di button nomer ke-"+i);
+          document.querySelector('#btn-play-'+i).style.cssText += "display: none;";
+          document.querySelector('#btn-stop-'+i).style.removeProperty('display');
+          document.querySelector('.audio-'+i).play();
+          // document.querySelector('.audio-'+i).style.removeProperty('display');
+          // document.querySelector('.image-'+i).style.removeProperty('display');
+          // document.querySelector('.detail-track-'+i).style.removeProperty('display');
+        })
+
+        document.querySelector('#btn-stop-'+i).addEventListener('click', function(){
+          console.log("aku stop di button nomer ke-"+i);
+          document.querySelector('#btn-play-'+i).style.cssText = "display: unset;";
+          document.querySelector('#btn-stop-'+i).style.cssText = "display: none;";
+          document.querySelector('.audio-'+i).pause();
+          document.querySelector('.audio-'+i).currentTime = 0;
+          // document.querySelector('.audio-'+i).style.cssText = "display: unset;";
+          // document.querySelector('.image-'+i).style.cssText = "display: unset;";
+          // document.querySelector('.detail-track-'+i).style.cssText = "display: unset;";          
+        })
+      }
+    })
+    .catch(function(error){
+      console.log(error);
+    })
+  }
 
   </script>
 </body>
