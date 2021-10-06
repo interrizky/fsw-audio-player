@@ -22,7 +22,7 @@
           <div class="search-bar">
             <input
               type="text"
-              class="form-control"
+              class="form-control input-search"
               placeholder="search your music here..."
             />
           </div>
@@ -32,43 +32,7 @@
           <div class="title-box">
             <h4>List Of Music</h4>
           </div>
-          <div class="wrapper-list">
-            <!-- <div
-              class="box-music-list list-number-0"
-              indexdata="0"
-              iddata="555750706"
-              id="list-0"
-            >
-              <div class="images-box">
-                <div
-                  class="images"
-                  style="
-                    background-image: url('https://is3-ssl.mzstatic.com/image/thumb/Music124/v4/8d/45/1d/8d451d7c-2214-696a-234a-be10e20a8af2/source/100x100bb.jpg');
-                  "
-                ></div>
-              </div>
-              <div class="desc-box">
-                <h4 class="title">
-                  White Shoes and The People Company and Abdul and The Coffee
-                  Theory
-                </h4>
-                <span class="artist"
-                  >White Shoes and The People Company and Abdul and The Coffee
-                  Theory</span
-                >
-                <span class="album"
-                  >White Shoes and The People Company and Abdul and The Coffee
-                  Theory</span
-                >
-              </div>
-              <div class="button-play-circle">
-                <div class="triangle-button"></div>
-              </div>
-              <div class="button-play-wave hide">
-                <i class="fas fa-wave-square"></i>
-              </div>
-            </div> -->
-          </div>
+          <div class="wrapper-list"></div>
         </div>
 
         <div class="row box-content music-player">
@@ -104,13 +68,13 @@
     </section>
 
     <script type="text/javascript">
-      let textSearch = document.querySelector('.form-control')
+      let textSearch = document.querySelector('.input-search')
 
       let wrapperList = document.querySelector('.list-music .wrapper-list')
 
-      textSearch.addEventListener('keypress', function (event) {
+      textSearch.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
-          // boxPlayer.innerHTML = ''
+          wrapperList.innerHTML = ''
           searchList(textSearch.value)
         }
       })
@@ -183,110 +147,236 @@
             </div>
           `
           )
+        }
 
-          let playing = document.querySelectorAll(
-            '.wrapper-list .box-music-list .button-play .button-playing'
-          )
+        let playing = document.querySelectorAll(
+          '.wrapper-list .box-music-list .button-play .button-playing'
+        )
 
-          let divPlay = document.querySelectorAll(
-            '.wrapper-list .box-music-list .button-play'
-          )
+        let divPlay = document.querySelectorAll(
+          '.wrapper-list .box-music-list .button-play'
+        )
 
-          let divStop = document.querySelectorAll(
-            '.wrapper-list .box-music-list .button-stop'
-          )
+        let divStop = document.querySelectorAll(
+          '.wrapper-list .box-music-list .button-stop'
+        )
 
-          let stopping = document.querySelectorAll(
-            '.wrapper-list .box-music-list .button-stop .button-stopping'
-          )
+        let stopping = document.querySelectorAll(
+          '.wrapper-list .box-music-list .button-stop .button-stopping'
+        )
 
-          let divBoxPlayer = document.querySelector(
-            '.box-content.music-player .wrapper-music-player'
-          )
+        let divBoxPlayer = document.querySelector(
+          '.box-content.music-player .wrapper-music-player'
+        )
 
-          let minPoster = document.querySelector('.wrapper-box .image-music')
+        let minPoster = document.querySelector('.wrapper-box .image-music')
 
-          let title_player = document.querySelector(
-            '.box-player .description-music .title-player'
-          )
+        let title_player = document.querySelector(
+          '.box-player .description-music .title-player'
+        )
 
-          let artist_name = document.querySelector(
-            '.box-player .description-music .artist-name'
-          )
+        let artist_name = document.querySelector(
+          '.box-player .description-music .artist-name'
+        )
 
-          let button_prev = document.querySelector(
-            '.wrapper-music-player .player-music .button-box .prev'
-          )
+        let button_prev = document.querySelector(
+          '.wrapper-music-player .player-music .button-box .prev'
+        )
 
-          let button_next = document.querySelector(
-            '.wrapper-music-player .player-music .button-box .next'
-          )
+        let button_next = document.querySelector(
+          '.wrapper-music-player .player-music .button-box .next'
+        )
 
-          playing[i].addEventListener('click', function () {
-            let fired_button = $(this).val()
+        $('.button-playing').click(function () {
+          var i = $(this).val()
 
-            /* button */
-            divPlay[i].classList.add('hide')
-            divStop[i].classList.remove('hide')
+          /* button */
+          divPlay[i].classList.add('hide')
+          divStop[i].classList.remove('hide')
 
-            /* music player */
-            divBoxPlayer.classList.add('active')
-            divBoxPlayer.classList.remove('hide')
+          /* music player */
+          divBoxPlayer.classList.add('active')
+          divBoxPlayer.classList.remove('hide')
 
+          /* playing */
+          let playlist = document.querySelector('.player-music .range-box')
+          playlist.innerHTML = `
+            <audio controls class="audio-${i} w-50 mx-auto col-12" style="display: none;">
+              <source class="trackPreview-${i}" src="${arrayList[i].previewUrl}"> type="audio/mpeg"><</source>
+            </audio>
+          `
+          document.querySelector('.audio-' + i).play()
+
+          /* detail description di music player */
+          minPoster.innerHTML = `
+            <div class="image-music">
+              <div class="image" style="background-image: url(${arrayList[i].artworkUrl60})"></div>
+            </div>
+          `
+          title_player.innerHTML = `
+            <h4 class="title-player">
+              ${arrayList[i].trackName}
+            </h4>
+          `
+          artist_name.innerHTML = `
+            <span class="artist-name">
+              <p>Artist :</p>
+              ${arrayList[i].artistName}
+            </span>
+          `
+
+          /* detail button di music player */
+          $('.prev').click(function () {
+            let currentIndex = i
+
+            /* stop playing */
+            document.querySelector('.audio-' + currentIndex).pause()
+            document.querySelector('.audio-' + currentIndex).currentTime = 0
+
+            console.log('indeks saat ini: ' + currentIndex)
+
+            divPlay[currentIndex].classList.remove('hide')
+            divStop[currentIndex].classList.add('hide')
+
+            currentIndex = currentIndex - 1
+
+            if (currentIndex < 0) {
+              currentIndex = 0
+              alert('Playlist Pertama')
+            }
+
+            console.log('indeks after: ' + currentIndex)
+            divPlay[currentIndex].classList.add('hide')
+            divStop[currentIndex].classList.remove('hide')
+
+            /* start new playing */
+            let playlist = document.querySelector('.player-music .range-box')
+            playlist.innerHTML = `
+              <audio controls class="audio-${currentIndex} w-50 mx-auto col-12" style="display: none;">
+                <source class="trackPreview-${currentIndex}" src="${arrayList[currentIndex].previewUrl}"> type="audio/mpeg"><</source>
+              </audio>
+            `
+            document.querySelector('.audio-' + currentIndex).play()
             /* detail description di music player */
             minPoster.innerHTML = `
               <div class="image-music">
-                <div class="image" style="background-image: url(${arrayList[fired_button].artworkUrl60})"></div>
+                <div class="image" style="background-image: url(${arrayList[currentIndex].artworkUrl60})"></div>
               </div>
             `
             title_player.innerHTML = `
               <h4 class="title-player">
-                ${arrayList[fired_button].trackName}
+                ${arrayList[currentIndex].trackName}
               </h4>
             `
             artist_name.innerHTML = `
               <span class="artist-name">
                 <p>Artist :</p>
-                ${arrayList[fired_button].artistName}
+                ${arrayList[currentIndex].artistName}
               </span>
             `
+          })
+          /* next */
+          $('.next').click(function () {
+            let currentIndex = i
 
-            /* detail button */
+            /* stop playing */
+            document.querySelector('.audio-' + currentIndex).pause()
+            document.querySelector('.audio-' + currentIndex).currentTime = 0
+            console.log('indeks pertama: ' + currentIndex)
 
-            /* tombol x di pojok kanan */
-            let closeX = document.querySelector(
-              '.wrapper-music-player .close-button'
-            )
-            closeX.addEventListener('click', function () {
-              divPlay[i].classList.remove('hide')
-              divStop[i].classList.add('hide')
-              /* music player */
-              divBoxPlayer.classList.remove('active')
-              divBoxPlayer.classList.add('hide')
-              /* detail description di music player */
-              minPoster.innerHTML = ''
-              title_player.innerHTML = ''
-              artist_name.innerHTML = ''
-              console.log(i)
-              console.log(fired_button)
-            })
+            divPlay[currentIndex].classList.remove('hide')
+            divStop[currentIndex].classList.add('hide')
+
+            currentIndex = parseInt(currentIndex) + 1
+
+            if (currentIndex >= arrayList.length) {
+              currentIndex = arrayList.length - 1
+              alert('Playlist Terakhir')
+            }
+
+            // alert('indeks after: ' + currentIndex)
+            divPlay[currentIndex].classList.add('hide')
+            divStop[currentIndex].classList.remove('hide')
+            console.log('indeks kedua: ' + currentIndex)
+
+            /* start new playing */
+            let playlist = document.querySelector('.player-music .range-box')
+            playlist.innerHTML = `
+              <audio controls class="audio-${currentIndex} w-50 mx-auto col-12" style="display: none;">
+                <source class="trackPreview-${currentIndex}" src="${arrayList[currentIndex].previewUrl}"> type="audio/mpeg"><</source>
+              </audio>
+            `
+            document.querySelector('.audio-' + currentIndex).play()
+            /* detail description di music player */
+            minPoster.innerHTML = `
+              <div class="image-music">
+                <div class="image" style="background-image: url(${arrayList[currentIndex].artworkUrl60})"></div>
+              </div>
+            `
+            title_player.innerHTML = `
+              <h4 class="title-player">
+                ${arrayList[currentIndex].trackName}
+              </h4>
+            `
+            artist_name.innerHTML = `
+              <span class="artist-name">
+                <p>Artist :</p>
+                ${arrayList[currentIndex].artistName}
+              </span>
+            `
+          })
+          /* pause */
+          $('.pause').click(function () {
+            let currentIndex = i
+            /* stop playing */
+            document.querySelector('.audio-' + currentIndex).pause()
+            document.querySelector('.audio-' + currentIndex).currentTime = 0
+          })
+          /* play */
+          $('.play').click(function () {
+            /* start new playing */
+            let currentIndex = i
+            let playlist = document.querySelector('.player-music .range-box')
+            playlist.innerHTML = `
+              <audio controls class="audio-${currentIndex} w-50 mx-auto col-12" style="display: none;">
+                <source class="trackPreview-${currentIndex}" src="${arrayList[currentIndex].previewUrl}"> type="audio/mpeg"><</source>
+              </audio>
+            `
+            document.querySelector('.audio-' + currentIndex).play()
           })
 
-          stopping[i].addEventListener('click', function () {
-            // let fired_button = $(this).val()
-            // console.log(fired_button)
-            // console.log(stopping)
-            divPlay[i].classList.remove('hide')
-            divStop[i].classList.add('hide')
+          /* tombol X di music player */
+          $('.close-button').click(function () {
+            let index = i
             /* music player */
             divBoxPlayer.classList.remove('active')
             divBoxPlayer.classList.add('hide')
-            /* detail description di music player */
-            minPoster.innerHTML = ''
-            title_player.innerHTML = ''
-            artist_name.innerHTML = ''
+
+            /* button play+stop all */
+            divPlay[index].classList.remove('hide')
+            divStop[index].classList.add('hide')
+
+            /* stop playing */
+            document.querySelector('.audio-' + index).pause()
+            document.querySelector('.audio-' + index).currentTime = 0
           })
-        }
+        })
+
+        $('.button-stopping').click(function () {
+          let i = $(this).val()
+          divPlay[i].classList.remove('hide')
+          divStop[i].classList.add('hide')
+          /* music player */
+          divBoxPlayer.classList.remove('active')
+          divBoxPlayer.classList.add('hide')
+          /* stop playing */
+          document.querySelector('.audio-' + i).pause()
+          document.querySelector('.audio-' + i).currentTime = 0
+          /* detail description di music player */
+          minPoster.innerHTML = ''
+          title_player.innerHTML = ''
+          artist_name.innerHTML = ''
+        })
       }
     </script>
     <script
