@@ -123,7 +123,7 @@ h4 {
 }
 
 #iTunes
-  .main-content
+  .container-fluid
   .box-content.music-player
   .wrapper-music-player
   .wrapper-box
@@ -183,7 +183,30 @@ h4 {
   transform: translateY(-50%);
 }
 
-.button-play-circle {
+.button-play {
+  width: 30px;
+  height: 30px;
+  /* left: 50px; */
+  /* background-color: #fff; */
+  /* border-radius: 50px; */
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: center;
+  justify-content: center;
+  -webkit-align-items: center;
+  align-items: center;
+  /* box-shadow: 3px 3px 5px rgba(25, 25, 25, 0.5); */
+  transition: 0.5s;
+  margin-left: 23%;
+  margin-right: 5%;
+}
+
+.button-play.hide {
+  transition: 0.5s;
+  display: none;
+}
+
+/* .button-play-circle {
   width: 30px;
   height: 30px;
   background-color: #fff;
@@ -209,9 +232,37 @@ h4 {
   border-top: 7.5px solid transparent;
   border-bottom: 7.5px solid transparent;
   border-left: 7.5px solid rgba(25, 25, 25, 0.5);
+} */
+
+.button-stop {
+  /* width: 30px;
+  height: 30px;
+  transition: 0.5s;
+  position: absolute;
+  /* right: 2.5%; */
+  /* top: 50%; */
+  /* margin-right: 10%;
+  margin-left: 88%;
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%); */
+
+  width: 30px;
+  height: 30px;
+  transition: 0.5s;
+  position: absolute;
+  right: 7%;
+  /* top: 50%; */
+  /* left: 2.5%; */
+  -webkit-transform: translateY(-50%);
+  transform: translateY(-50%);
 }
 
-.button-play-wave {
+.button-stop.hide {
+  transition: 0.5s;
+  display: none;
+}
+
+/* .button-play-wave {
   transition: 0.5s;
   position: absolute;
   right: 2.5%;
@@ -223,7 +274,7 @@ h4 {
 .button-play-wave.hide {
   transition: 0.5s;
   display: none;
-}
+} */
 
 #iTunes .container-fluid .box-content.music-player {
   position: absolute;
@@ -233,9 +284,30 @@ h4 {
   left: 50%;
   -webkit-transform: translateX(-50%);
   transform: translateX(-50%);
+}
+
+#iTunes .container-fluid .box-content.music-player .wrapper-music-player {
+  width: 100%;
+  height: auto;
+  position: absolute;
+  padding: 15px;
+  bottom: -100px;
+  left: 50%;
+  -webkit-transform: translateX(-50%);
+  transform: translateX(-50%);
   background-color: #4d4d4d;
   border-top-left-radius: 10px;
   border-top-right-radius: 10px;
+  visibility: hidden;
+}
+
+#iTunes
+  .container-fluid
+  .box-content.music-player
+  .wrapper-music-player.active {
+  visibility: visible;
+  bottom: 0;
+  transition: 0.25s;
 }
 
 #iTunes .container-fluid .box-content.music-player .wrapper-music-player.hide {
