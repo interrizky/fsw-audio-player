@@ -33,7 +33,7 @@
             <h4>List Of Music</h4>
           </div>
           <div class="wrapper-list">
-            <div
+            <!-- <div
               class="box-music-list list-number-0"
               indexdata="0"
               iddata="555750706"
@@ -67,29 +67,21 @@
               <div class="button-play-wave hide">
                 <i class="fas fa-wave-square"></i>
               </div>
-            </div>
+            </div> -->
           </div>
         </div>
 
         <div class="row box-content music-player">
-          <div class="wrapper-music-player">
+          <div class="wrapper-music-player hide">
             <div class="wrapper-box">
               <div class="image-music">
-                <div
-                  class="image"
-                  style="
-                    background-image: url('https://is3-ssl.mzstatic.com/image/thumb/Music124/v4/8d/45/1d/8d451d7c-2214-696a-234a-be10e20a8af2/source/100x100bb.jpg');
-                  "
-                ></div>
+                <div class="image" style="background-image: url()"></div>
               </div>
               <div class="box-player">
                 <div class="description-music">
-                  <h4 class="title-player">
-                    White Shoes and The People Company and Abdul and The Coffee
-                  </h4>
+                  <h4 class="title-player"></h4>
                   <span class="artist-name">
                     <p>Artist :</p>
-                    White Shoes and The People Company and Abdul and The Coffee
                   </span>
                 </div>
               </div>
@@ -110,5 +102,207 @@
         </div>
       </div>
     </section>
+
+    <script type="text/javascript">
+      let textSearch = document.querySelector('.form-control')
+
+      let wrapperList = document.querySelector('.list-music .wrapper-list')
+
+      textSearch.addEventListener('keypress', function (event) {
+        if (event.keyCode === 13) {
+          // boxPlayer.innerHTML = ''
+          searchList(textSearch.value)
+        }
+      })
+
+      searchList()
+
+      function searchList(params = 'Indonesia') {
+        fetch(
+          'https://itunes.apple.com/search?term=' +
+            params +
+            '&country=ID&media=music&limit=20'
+        )
+          .then(function (response) {
+            // console.log(response)
+
+            if (response.status !== 200) {
+              alert('Fetch data Error!')
+              searchList()
+            } else {
+              return response.json()
+            }
+          })
+          .then(function (data) {
+            console.log(data)
+            buildList(data.results)
+          })
+      }
+
+      function buildList(arrayList) {
+        for (let i = 0; i < arrayList.length; i++) {
+          wrapperList.insertAdjacentHTML(
+            'beforeend',
+            `
+          <div
+            class="box-music-list list-number-${i}"
+            indexdata=${i}
+            iddata="${arrayList[i].collectionId}
+            id="list-${i}"
+          >
+            <div class="images-box">
+              <div
+                class="images"
+                style="
+                  background-image: url(${arrayList[i].artworkUrl100});
+                "
+              ></div>
+            </div>
+            <div class="desc-box">
+              <h4 class="title">
+                ${arrayList[i].trackName}
+              </h4>
+              <span class="artist">
+                ${arrayList[i].artistName}
+              </span>
+              <span class="album">
+                ${arrayList[i].collectionName}
+              </span>
+            </div>
+            <div class="button-play">
+              <button type="button" value="${i}" class="button-playing btn-play-${i} btn btn-outline-light">
+                <i class="bi-play-circle"></i>
+                PLAY
+              </button>
+            </div>
+            <div class="button-stop hide">
+              <button type="button" value="${i}" class="button-stopping btn-stop-${i} btn btn-outline-danger">
+                <i class="bi-stop-circle-fill"></i>
+                STOP
+              </button>
+            </div>
+          `
+          )
+
+          let playing = document.querySelectorAll(
+            '.wrapper-list .box-music-list .button-play .button-playing'
+          )
+
+          let divPlay = document.querySelectorAll(
+            '.wrapper-list .box-music-list .button-play'
+          )
+
+          let divStop = document.querySelectorAll(
+            '.wrapper-list .box-music-list .button-stop'
+          )
+
+          let stopping = document.querySelectorAll(
+            '.wrapper-list .box-music-list .button-stop .button-stopping'
+          )
+
+          let divBoxPlayer = document.querySelector(
+            '.box-content.music-player .wrapper-music-player'
+          )
+
+          let minPoster = document.querySelector('.wrapper-box .image-music')
+
+          let title_player = document.querySelector(
+            '.box-player .description-music .title-player'
+          )
+
+          let artist_name = document.querySelector(
+            '.box-player .description-music .artist-name'
+          )
+
+          let button_prev = document.querySelector(
+            '.wrapper-music-player .player-music .button-box .prev'
+          )
+
+          let button_next = document.querySelector(
+            '.wrapper-music-player .player-music .button-box .next'
+          )
+
+          playing[i].addEventListener('click', function () {
+            let fired_button = $(this).val()
+
+            /* button */
+            divPlay[i].classList.add('hide')
+            divStop[i].classList.remove('hide')
+
+            /* music player */
+            divBoxPlayer.classList.add('active')
+            divBoxPlayer.classList.remove('hide')
+
+            /* detail description di music player */
+            minPoster.innerHTML = `
+              <div class="image-music">
+                <div class="image" style="background-image: url(${arrayList[fired_button].artworkUrl60})"></div>
+              </div>
+            `
+            title_player.innerHTML = `
+              <h4 class="title-player">
+                ${arrayList[fired_button].trackName}
+              </h4>
+            `
+            artist_name.innerHTML = `
+              <span class="artist-name">
+                <p>Artist :</p>
+                ${arrayList[fired_button].artistName}
+              </span>
+            `
+
+            /* detail button */
+
+            /* tombol x di pojok kanan */
+            let closeX = document.querySelector(
+              '.wrapper-music-player .close-button'
+            )
+            closeX.addEventListener('click', function () {
+              divPlay[i].classList.remove('hide')
+              divStop[i].classList.add('hide')
+              /* music player */
+              divBoxPlayer.classList.remove('active')
+              divBoxPlayer.classList.add('hide')
+              /* detail description di music player */
+              minPoster.innerHTML = ''
+              title_player.innerHTML = ''
+              artist_name.innerHTML = ''
+              console.log(i)
+              console.log(fired_button)
+            })
+          })
+
+          stopping[i].addEventListener('click', function () {
+            // let fired_button = $(this).val()
+            // console.log(fired_button)
+            // console.log(stopping)
+            divPlay[i].classList.remove('hide')
+            divStop[i].classList.add('hide')
+            /* music player */
+            divBoxPlayer.classList.remove('active')
+            divBoxPlayer.classList.add('hide')
+            /* detail description di music player */
+            minPoster.innerHTML = ''
+            title_player.innerHTML = ''
+            artist_name.innerHTML = ''
+          })
+        }
+      }
+    </script>
+    <script
+      src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+      integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
   </body>
 </html>
