@@ -433,6 +433,9 @@ h4 {
   width: 100%;
   height: auto;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 #iTunes
@@ -442,7 +445,7 @@ h4 {
   .player-music
   .range-box
   input {
-  width: 100%;
+  width: 90%;
 }
 
 input[type='range' i] {
