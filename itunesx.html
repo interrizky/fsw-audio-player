@@ -193,8 +193,11 @@
           /* button */
           divPlay[i].classList.add('hide')
           divStop[i].classList.remove('hide')
-          let selector = document.getElementsByClassName('button-play')
-          console.log(selector)
+          let selector = document.getElementsByClassName('button-stop')
+          for (let j = 0; j < selector.length; i++) {
+            // selector[i].classList.add('hide')
+            console.log(selector[j].classList)
+          }
 
           /* music player */
           divBoxPlayer.classList.add('active')
