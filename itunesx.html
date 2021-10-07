@@ -95,11 +95,8 @@
       textSearch.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
           wrapperList.innerHTML = ''
-          /* music player */
-          // divBoxPlayer.classList.remove('active')
-          // divBoxPlayer.classList.add('hide')
-          // divBoxPlayer.innerHTML = ''
           searchList(textSearch.value)
+          textSearch.value = ''
         }
       })
 
