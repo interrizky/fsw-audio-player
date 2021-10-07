@@ -193,6 +193,8 @@
           /* button */
           divPlay[i].classList.add('hide')
           divStop[i].classList.remove('hide')
+          let selector = document.getElementsByClassName('button-play')
+          console.log(selector)
 
           /* music player */
           divBoxPlayer.classList.add('active')
@@ -297,7 +299,7 @@
             // alert('indeks after: ' + currentIndex)
             divPlay[currentIndex].classList.add('hide')
             divStop[currentIndex].classList.remove('hide')
-            console.log('indeks kedua: ' + currentIndex)
+            console.log('indeks setelahnya: ' + currentIndex)
 
             /* start new playing */
             let playlist = document.querySelector('.player-music .range-box')
