@@ -36,7 +36,8 @@
         </div>
 
         <div class="row box-content music-player">
-          <div class="wrapper-music-player hide">
+          <div class="wrapper-music-player">
+            <!-- <div class="wrapper-music-player hide"> -->
             <div class="wrapper-box">
               <div class="image-music">
                 <div class="image" style="background-image: url()"></div>
@@ -52,7 +53,23 @@
             </div>
             <div class="player-music">
               <div class="range-box">
-                <input type="range" id="music-duration" min="0" value="0" />
+                <audio
+                  controls="controls"
+                  class="audio-player w-50 mx-auto col-12"
+                  src=""
+                  type="audio/mpeg"
+                  style="display: none"
+                ></audio>
+                <div class="current-time">00:00</div>
+                <input
+                  type="range"
+                  id="music-duration"
+                  min="1"
+                  max="100"
+                  value="0"
+                  class="seek_slider"
+                />
+                <div class="total-duration">00:00</div>
               </div>
               <div class="button-box">
                 <button id="prev" class="prev">Prev</button>
@@ -71,10 +88,17 @@
       let textSearch = document.querySelector('.input-search')
 
       let wrapperList = document.querySelector('.list-music .wrapper-list')
+      let divBoxPlayer = document.querySelector(
+        '.box-content.music-player .wrapper-music-player'
+      )
 
       textSearch.addEventListener('keyup', function (event) {
         if (event.keyCode === 13) {
           wrapperList.innerHTML = ''
+          /* music player */
+          // divBoxPlayer.classList.remove('active')
+          // divBoxPlayer.classList.add('hide')
+          // divBoxPlayer.innerHTML = ''
           searchList(textSearch.value)
         }
       })
@@ -88,20 +112,18 @@
             '&country=ID&media=music&limit=20'
         )
           .then(function (response) {
-            // console.log(response)
-
-            if (response.status !== 200) {
-              alert('Fetch data Error!')
-              searchList()
-            } else {
-              return response.json()
-            }
+            return response.json()
           })
           .then(function (data) {
-            console.log(data)
+            // console.log(data)
             buildList(data.results)
           })
+          .catch(function (error) {
+            console.log(error)
+          })
       }
+
+      let track_list = []
 
       function buildList(arrayList) {
         for (let i = 0; i < arrayList.length; i++) {
@@ -147,7 +169,18 @@
             </div>
           `
           )
+
+          track_list[i] = {
+            title: arrayList[i].trackName,
+            artist: arrayList[i].artistName,
+            artwork60: arrayList[i].artworkUrl60,
+            path: arrayList[i].previewUrl
+          }
+
+          // console.log(track_list);
         }
+
+        // console.log(track_list.length)
 
         let playing = document.querySelectorAll(
           '.wrapper-list .box-music-list .button-play .button-playing'
@@ -165,10 +198,6 @@
           '.wrapper-list .box-music-list .button-stop .button-stopping'
         )
 
-        let divBoxPlayer = document.querySelector(
-          '.box-content.music-player .wrapper-music-player'
-        )
-
         let minPoster = document.querySelector('.wrapper-box .image-music')
 
         let title_player = document.querySelector(
@@ -183,172 +212,202 @@
           '.wrapper-music-player .player-music .button-box .prev'
         )
 
+        let button_pause = document.querySelector(
+          '.wrapper-music-player .player-music .button-box .pause'
+        )
+
+        let button_play = document.querySelector(
+          '.wrapper-music-player .player-music .button-box .play'
+        )
+
         let button_next = document.querySelector(
           '.wrapper-music-player .player-music .button-box .next'
         )
 
+        let curr_track = document.querySelector('.range-box .audio-player')
+
+        let seek_slider = document.querySelector('.seek_slider')
+        let curr_time = document.querySelector('.current-time')
+        let total_duration = document.querySelector('.total-duration')
+
+        // Specify globally used values
+        let track_index = 0
+        let isPlaying = false
+        let updateTimer
+
+        function loadTrack(track_index) {
+          // Clear the previous seek timer
+          clearInterval(updateTimer)
+          resetValues()
+
+          // Load a new track
+          curr_track.src = track_list[track_index].path
+          curr_track.load()
+
+          console.log()
+
+          // Update details of the track
+          minPoster.innerHTML =
+            `
+            <div class="image-music">
+              <div class="image" style="background-image: url(` +
+            track_list[track_index].artwork60 +
+            `)"></div>
+            </div>
+          `
+          title_player.innerHTML =
+            `
+            <h4 class="title-player">
+              ` +
+            track_list[track_index].title +
+            `
+            </h4>
+          `
+          artist_name.innerHTML =
+            `
+            <span class="artist-name">
+              <p>Artist :</p>
+              ` +
+            track_list[track_index].artist +
+            `
+            </span>
+          `
+
+          //set button action
+          button_prev.addEventListener('click', prevTrack)
+          button_pause.addEventListener('click', playpauseTrack)
+          button_play.addEventListener('click', playpauseTrack)
+          button_next.addEventListener('click', nextTrack)
+          seek_slider.addEventListener('change', seekTo)
+
+          // Set an interval of 1000 milliseconds
+          // for updating the seek slider
+          updateTimer = setInterval(seekUpdate, 1000)
+
+          // Move to the next track if the current finishes playing
+          // using the 'ended' event
+          curr_track.addEventListener('ended', nextTrack)
+        }
+
+        // Function to reset all values to their default
+        function resetValues() {
+          curr_time.textContent = '00:00'
+          total_duration.textContent = '00:00'
+          seek_slider.value = 0
+        }
+
+        function playpauseTrack() {
+          // Switch between playing and pausing
+          // depending on the current state
+          if (!isPlaying) playTrack()
+          else pauseTrack()
+        }
+
+        function playTrack() {
+          // Play the loaded track
+          curr_track.play()
+          isPlaying = true
+
+          // Replace icon with the pause icon
+          // playpause_btn.innerHTML = '<i class="fa fa-pause-circle fa-5x"></i>'
+        }
+
+        function pauseTrack() {
+          // Pause the loaded track
+          curr_track.pause()
+          isPlaying = false
+
+          // Replace icon with the play icon
+          // playpause_btn.innerHTML = '<i class="fa fa-play-circle fa-5x"></i>'
+        }
+
+        function nextTrack() {
+          // Go back to the first track if the
+          // current one is the last in the track list
+          if (track_index < track_list.length - 1) track_index += 1
+          else track_index = 0
+
+          // Load and play the new track
+          loadTrack(track_index)
+          playTrack()
+        }
+
+        function prevTrack() {
+          // Go back to the last track if the
+          // current one is the first in the track list
+          if (track_index > 0) track_index -= 1
+          else track_index = track_list.length - 1
+
+          // Load and play the new track
+          loadTrack(track_index)
+          playTrack()
+        }
+
+        function seekTo() {
+          // Calculate the seek position by the
+          // percentage of the seek slider
+          // and get the relative duration to the track
+          seekto = curr_track.duration * (seek_slider.value / 100)
+
+          // Set the current track position to the calculated seek position
+          curr_track.currentTime = seekto
+        }
+
+        function seekUpdate() {
+          let seekPosition = 0
+
+          // Check if the current track duration is a legible number
+          if (!isNaN(curr_track.duration)) {
+            seekPosition = curr_track.currentTime * (100 / curr_track.duration)
+            seek_slider.value = seekPosition
+
+            // Calculate the time left and the total duration
+            let currentMinutes = Math.floor(curr_track.currentTime / 60)
+            let currentSeconds = Math.floor(
+              curr_track.currentTime - currentMinutes * 60
+            )
+            let durationMinutes = Math.floor(curr_track.duration / 60)
+            let durationSeconds = Math.floor(
+              curr_track.duration - durationMinutes * 60
+            )
+
+            // Add a zero to the single digit time values
+            if (currentSeconds < 10) {
+              currentSeconds = '0' + currentSeconds
+            }
+            if (durationSeconds < 10) {
+              durationSeconds = '0' + durationSeconds
+            }
+            if (currentMinutes < 10) {
+              currentMinutes = '0' + currentMinutes
+            }
+            if (durationMinutes < 10) {
+              durationMinutes = '0' + durationMinutes
+            }
+
+            // Display the updated duration
+            curr_time.textContent = currentMinutes + ':' + currentSeconds
+            total_duration.textContent = durationMinutes + ':' + durationSeconds
+          }
+        }
+
         $('.button-playing').click(function () {
-          var i = $(this).val()
+          let i = parseInt($(this).val())
+          currentIndex = i
+
+          // let i = $(this).val()
+          // console.log(i)
 
           /* button */
           divPlay[i].classList.add('hide')
           divStop[i].classList.remove('hide')
-          let selector = document.getElementsByClassName('button-stop')
-          for (let j = 0; j < selector.length; i++) {
-            // selector[i].classList.add('hide')
-            console.log(selector[j].classList)
-          }
 
           /* music player */
           divBoxPlayer.classList.add('active')
           divBoxPlayer.classList.remove('hide')
 
-          /* playing */
-          let playlist = document.querySelector('.player-music .range-box')
-          playlist.innerHTML = `
-            <audio controls class="audio-${i} w-50 mx-auto col-12" style="display: none;">
-              <source class="trackPreview-${i}" src="${arrayList[i].previewUrl}"> type="audio/mpeg"><</source>
-            </audio>
-          `
-          document.querySelector('.audio-' + i).play()
-
-          /* detail description di music player */
-          minPoster.innerHTML = `
-            <div class="image-music">
-              <div class="image" style="background-image: url(${arrayList[i].artworkUrl60})"></div>
-            </div>
-          `
-          title_player.innerHTML = `
-            <h4 class="title-player">
-              ${arrayList[i].trackName}
-            </h4>
-          `
-          artist_name.innerHTML = `
-            <span class="artist-name">
-              <p>Artist :</p>
-              ${arrayList[i].artistName}
-            </span>
-          `
-
-          /* detail button di music player */
-          $('.prev').click(function () {
-            let currentIndex = i
-
-            /* stop playing */
-            document.querySelector('.audio-' + currentIndex).pause()
-            document.querySelector('.audio-' + currentIndex).currentTime = 0
-
-            console.log('indeks saat ini: ' + currentIndex)
-
-            divPlay[currentIndex].classList.remove('hide')
-            divStop[currentIndex].classList.add('hide')
-
-            currentIndex = currentIndex - 1
-
-            if (currentIndex < 0) {
-              currentIndex = 0
-              alert('Playlist Pertama')
-            }
-
-            console.log('indeks after: ' + currentIndex)
-            divPlay[currentIndex].classList.add('hide')
-            divStop[currentIndex].classList.remove('hide')
-
-            /* start new playing */
-            let playlist = document.querySelector('.player-music .range-box')
-            playlist.innerHTML = `
-              <audio controls class="audio-${currentIndex} w-50 mx-auto col-12" style="display: none;">
-                <source class="trackPreview-${currentIndex}" src="${arrayList[currentIndex].previewUrl}"> type="audio/mpeg"><</source>
-              </audio>
-            `
-            document.querySelector('.audio-' + currentIndex).play()
-            /* detail description di music player */
-            minPoster.innerHTML = `
-              <div class="image-music">
-                <div class="image" style="background-image: url(${arrayList[currentIndex].artworkUrl60})"></div>
-              </div>
-            `
-            title_player.innerHTML = `
-              <h4 class="title-player">
-                ${arrayList[currentIndex].trackName}
-              </h4>
-            `
-            artist_name.innerHTML = `
-              <span class="artist-name">
-                <p>Artist :</p>
-                ${arrayList[currentIndex].artistName}
-              </span>
-            `
-          })
-          /* next */
-          $('.next').click(function () {
-            let currentIndex = i
-
-            /* stop playing */
-            document.querySelector('.audio-' + currentIndex).pause()
-            document.querySelector('.audio-' + currentIndex).currentTime = 0
-            console.log('indeks pertama: ' + currentIndex)
-
-            divPlay[currentIndex].classList.remove('hide')
-            divStop[currentIndex].classList.add('hide')
-
-            currentIndex = parseInt(currentIndex) + 1
-
-            if (currentIndex >= arrayList.length) {
-              currentIndex = arrayList.length - 1
-              alert('Playlist Terakhir')
-            }
-
-            // alert('indeks after: ' + currentIndex)
-            divPlay[currentIndex].classList.add('hide')
-            divStop[currentIndex].classList.remove('hide')
-            console.log('indeks setelahnya: ' + currentIndex)
-
-            /* start new playing */
-            let playlist = document.querySelector('.player-music .range-box')
-            playlist.innerHTML = `
-              <audio controls class="audio-${currentIndex} w-50 mx-auto col-12" style="display: none;">
-                <source class="trackPreview-${currentIndex}" src="${arrayList[currentIndex].previewUrl}"> type="audio/mpeg"><</source>
-              </audio>
-            `
-            document.querySelector('.audio-' + currentIndex).play()
-            /* detail description di music player */
-            minPoster.innerHTML = `
-              <div class="image-music">
-                <div class="image" style="background-image: url(${arrayList[currentIndex].artworkUrl60})"></div>
-              </div>
-            `
-            title_player.innerHTML = `
-              <h4 class="title-player">
-                ${arrayList[currentIndex].trackName}
-              </h4>
-            `
-            artist_name.innerHTML = `
-              <span class="artist-name">
-                <p>Artist :</p>
-                ${arrayList[currentIndex].artistName}
-              </span>
-            `
-          })
-          /* pause */
-          $('.pause').click(function () {
-            let currentIndex = i
-            /* stop playing */
-            document.querySelector('.audio-' + currentIndex).pause()
-            document.querySelector('.audio-' + currentIndex).currentTime = 0
-          })
-          /* play */
-          $('.play').click(function () {
-            /* start new playing */
-            let currentIndex = i
-            let playlist = document.querySelector('.player-music .range-box')
-            playlist.innerHTML = `
-              <audio controls class="audio-${currentIndex} w-50 mx-auto col-12" style="display: none;">
-                <source class="trackPreview-${currentIndex}" src="${arrayList[currentIndex].previewUrl}"> type="audio/mpeg"><</source>
-              </audio>
-            `
-            document.querySelector('.audio-' + currentIndex).play()
-          })
+          /* load the loadTrack() */
+          loadTrack(i)
 
           /* tombol X di music player */
           $('.close-button').click(function () {
@@ -362,8 +421,7 @@
             divStop[index].classList.add('hide')
 
             /* stop playing */
-            document.querySelector('.audio-' + index).pause()
-            document.querySelector('.audio-' + index).currentTime = 0
+            pauseTrack()
           })
         })
 
@@ -371,16 +429,17 @@
           let i = $(this).val()
           divPlay[i].classList.remove('hide')
           divStop[i].classList.add('hide')
+
           /* music player */
           divBoxPlayer.classList.remove('active')
           divBoxPlayer.classList.add('hide')
+
+          /* button play+stop all */
+          divPlay[i].classList.remove('hide')
+          divStop[i].classList.add('hide')
+
           /* stop playing */
-          document.querySelector('.audio-' + i).pause()
-          document.querySelector('.audio-' + i).currentTime = 0
-          /* detail description di music player */
-          minPoster.innerHTML = ''
-          title_player.innerHTML = ''
-          artist_name.innerHTML = ''
+          pauseTrack()
         })
       }
     </script>
