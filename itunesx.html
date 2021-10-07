@@ -170,17 +170,14 @@
           `
           )
 
+          // untuk detail audio player
           track_list[i] = {
             title: arrayList[i].trackName,
             artist: arrayList[i].artistName,
             artwork60: arrayList[i].artworkUrl60,
             path: arrayList[i].previewUrl
           }
-
-          // console.log(track_list);
         }
-
-        // console.log(track_list.length)
 
         let playing = document.querySelectorAll(
           '.wrapper-list .box-music-list .button-play .button-playing'
@@ -234,6 +231,56 @@
         let track_index = 0
         let isPlaying = false
         let updateTimer
+
+        $('.button-playing').click(function () {
+          track_index = parseInt($(this).val())
+          let i = track_index
+
+          /* button */
+          divPlay[i].classList.add('hide')
+          divStop[i].classList.remove('hide')
+
+          /* music player */
+          divBoxPlayer.classList.add('active')
+          divBoxPlayer.classList.remove('hide')
+
+          /* load the loadTrack and play */
+          loadTrack(i)
+          playTrack()
+
+          /* tombol X di music player */
+          $('.close-button').click(function () {
+            /* music player */
+            divBoxPlayer.classList.remove('active')
+            divBoxPlayer.classList.add('hide')
+
+            /* stop playing */
+            pauseTrack()
+
+            /* button play+stop all */
+            for (let i = 0; i < track_list.length; i++) {
+              divPlay[i].classList.remove('hide')
+              divStop[i].classList.add('hide')
+            }
+          })
+        })
+
+        $('.button-stopping').click(function () {
+          let i = $(this).val()
+          divPlay[i].classList.remove('hide')
+          divStop[i].classList.add('hide')
+
+          /* music player */
+          divBoxPlayer.classList.remove('active')
+          divBoxPlayer.classList.add('hide')
+
+          /* button play+stop all */
+          divPlay[i].classList.remove('hide')
+          divStop[i].classList.add('hide')
+
+          /* stop playing */
+          pauseTrack()
+        })
 
         function loadTrack(track_index) {
           // Clear the previous seek timer
@@ -318,14 +365,31 @@
           isPlaying = false
 
           // Replace icon with the play icon
-          // playpause_btn.innerHTML = '<i class="fa fa-play-circle fa-5x"></i>'
+          // playpause_btn.innerHTML = '<i class="fa fa-play-circle fa-5x"></i>')
         }
 
         function nextTrack() {
           // Go back to the first track if the
           // current one is the last in the track list
-          if (track_index < track_list.length - 1) track_index += 1
-          else track_index = 0
+          if (track_index < track_list.length - 1) {
+            track_index += 1
+
+            // indeks sebelumnya
+            divStop[track_index - 1].classList.add('hide')
+            divPlay[track_index - 1].classList.remove('hide')
+            // indeks saat ini
+            divStop[track_index].classList.remove('hide')
+            divPlay[track_index].classList.add('hide')
+          } else {
+            track_index = 0
+
+            // indeks sebelumnya
+            divStop[track_list.length - 1].classList.add('hide')
+            divPlay[track_list.length - 1].classList.remove('hide')
+            // indeks saat ini
+            divStop[track_index].classList.remove('hide')
+            divPlay[track_index].classList.add('hide')
+          }
 
           // Load and play the new track
           loadTrack(track_index)
@@ -335,8 +399,25 @@
         function prevTrack() {
           // Go back to the last track if the
           // current one is the first in the track list
-          if (track_index > 0) track_index -= 1
-          else track_index = track_list.length - 1
+          if (track_index > 0) {
+            track_index -= 1
+
+            // indeks sebelumnya
+            divStop[track_index + 1].classList.add('hide')
+            divPlay[track_index + 1].classList.remove('hide')
+            // indeks saat ini
+            divStop[track_index].classList.remove('hide')
+            divPlay[track_index].classList.add('hide')
+          } else {
+            track_index = track_list.length - 1
+
+            // indeks sebelumnya
+            divStop[0].classList.add('hide')
+            divPlay[0].classList.remove('hide')
+            // indeks saat ini
+            divStop[track_index].classList.remove('hide')
+            divPlay[track_index].classList.add('hide')
+          }
 
           // Load and play the new track
           loadTrack(track_index)
@@ -390,57 +471,6 @@
             total_duration.textContent = durationMinutes + ':' + durationSeconds
           }
         }
-
-        $('.button-playing').click(function () {
-          let i = parseInt($(this).val())
-          currentIndex = i
-
-          // let i = $(this).val()
-          // console.log(i)
-
-          /* button */
-          divPlay[i].classList.add('hide')
-          divStop[i].classList.remove('hide')
-
-          /* music player */
-          divBoxPlayer.classList.add('active')
-          divBoxPlayer.classList.remove('hide')
-
-          /* load the loadTrack() */
-          loadTrack(i)
-
-          /* tombol X di music player */
-          $('.close-button').click(function () {
-            let index = i
-            /* music player */
-            divBoxPlayer.classList.remove('active')
-            divBoxPlayer.classList.add('hide')
-
-            /* button play+stop all */
-            divPlay[index].classList.remove('hide')
-            divStop[index].classList.add('hide')
-
-            /* stop playing */
-            pauseTrack()
-          })
-        })
-
-        $('.button-stopping').click(function () {
-          let i = $(this).val()
-          divPlay[i].classList.remove('hide')
-          divStop[i].classList.add('hide')
-
-          /* music player */
-          divBoxPlayer.classList.remove('active')
-          divBoxPlayer.classList.add('hide')
-
-          /* button play+stop all */
-          divPlay[i].classList.remove('hide')
-          divStop[i].classList.add('hide')
-
-          /* stop playing */
-          pauseTrack()
-        })
       }
     </script>
     <script
