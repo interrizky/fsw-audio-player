@@ -167,7 +167,7 @@
           `
           )
 
-          // untuk detail audio player
+          // array untuk detail-detail description di audio player
           track_list[i] = {
             title: arrayList[i].trackName,
             artist: arrayList[i].artistName,
@@ -234,6 +234,12 @@
           let i = track_index
 
           /* button */
+          /* button play+stop all */
+          for (let z = 0; z < track_list.length; z++) {
+            divPlay[z].classList.remove('hide')
+            divStop[z].classList.add('hide')
+          }
+          /* only specific index that playing change the state */
           divPlay[i].classList.add('hide')
           divStop[i].classList.remove('hide')
 
@@ -244,22 +250,22 @@
           /* load the loadTrack and play */
           loadTrack(i)
           playTrack()
+        })
 
-          /* tombol X di music player */
-          $('.close-button').click(function () {
-            /* music player */
-            divBoxPlayer.classList.remove('active')
-            divBoxPlayer.classList.add('hide')
+        /* tombol X di music player */
+        $('.close-button').click(function () {
+          /* music player */
+          divBoxPlayer.classList.remove('active')
+          divBoxPlayer.classList.add('hide')
 
-            /* stop playing */
-            pauseTrack()
+          /* stop playing */
+          pauseTrack()
 
-            /* button play+stop all */
-            for (let i = 0; i < track_list.length; i++) {
-              divPlay[i].classList.remove('hide')
-              divStop[i].classList.add('hide')
-            }
-          })
+          /* button play+stop all */
+          for (let i = 0; i < track_list.length; i++) {
+            divPlay[i].classList.remove('hide')
+            divStop[i].classList.add('hide')
+          }
         })
 
         $('.button-stopping').click(function () {
